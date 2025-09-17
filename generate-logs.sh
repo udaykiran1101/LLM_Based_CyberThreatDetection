@@ -3,11 +3,6 @@
 API_BASE="http://localhost:8080/api"
 LOG_FILE="logs/ecosystem-$(date +%Y%m%d-%H%M%S).log"
 
-echo "🧪 Generating Sample Logs for PayPal Clone"
-echo "==========================================="
-echo "📝 Logs will be saved to: $LOG_FILE"
-echo ""
-
 mkdir -p logs
 
 log_with_timestamp() {
@@ -23,29 +18,27 @@ make_api_call() {
     local url="$API_BASE$endpoint"
     log_with_timestamp "🔄 API Call: $method $url"
     
-    if [ -n "$data" ]; then
-        if [ -n "$header" ]; then
-            response=$(curl -s -X "$method" "$url" -H "Content-Type: application/json" -H "$header" -d "$data")
-        else
-            response=$(curl -s -X "$method" "$url" -H "Content-Type: application/json" -d "$data")
-        fi
-    else
-        if [ -n "$header" ]; then
-            response=$(curl -s -X "$method" "$url" -H "$header")
-        else
-            response=$(curl -s -X "$method" "$url")
-        fi
+    local curl_opts=(-s -X "$method")
+    
+    curl_opts+=(-H "Content-Type: application/json")
+    
+    if [ -n "$header" ]; then
+        curl_opts+=(-H "$header")
     fi
     
+    if [ -n "$data" ]; then
+        curl_opts+=(-d "$data")
+    fi
+    
+    response=$(curl "${curl_opts[@]}" "$url")
     log_with_timestamp "📥 Response: $response"
     echo "$response"
 }
 
-# Extract JSON values
 extract_json_value() {
     local json="$1" 
     local key="$2"
-    echo "$json" | grep -o "\"$key\":\"[^\"]*\"" | cut -d'"' -f4
+    echo "$json" | grep -o "\"$key\":\"[^\"]*\"" | sed -E 's/"[^"]*":"([^"]*)"/\1/'
 }
 
 log_with_timestamp "🚀 Starting PayPal Clone Ecosystem Test Suite"
@@ -87,12 +80,17 @@ for user in "${users[@]}"; do
     response=$(make_api_call "POST" "/auth/login" "{\"email\":\"$user\",\"password\":\"password123\"}" "")
     
     token=$(extract_json_value "$response" "token")
-    token=$(echo "$token" | tr -d '\n\r' | xargs)
+    token=$(echo "$token" | tr -d '\n\r' | sed 's/[[:space:]]//g')
     
     if [ -n "$token" ] && [ "$token" != "null" ]; then
         tokens+=("$token")
-        short_token="${token:0:8}..."
-        log_with_timestamp "✅ Token extracted successfully for $user (token=$short_token)"
+        short_token="${token:0:20}..."
+        log_with_timestamp "✅ Token extracted successfully for $user"
+        log_with_timestamp "🔒 Token details: $short_token"
+        
+        # Verify immediately after login
+        log_with_timestamp "🔑 Verifying token immediately after login"
+        make_api_call "POST" "/auth/verify" "" "Authorization: Bearer $token"
     else
         tokens+=("")
         log_with_timestamp "❌ Failed to extract token for $user"
@@ -109,7 +107,7 @@ for i in "${!tokens[@]}"; do
     token="${tokens[$i]}"
     if [ -n "$token" ] && [ "$token" != "null" ]; then
         log_with_timestamp "🎫 Verifying token for ${users[$i]}"
-        make_api_call "POST" "/auth/verify" "{}" "Authorization: Bearer $token"
+        make_api_call "POST" "/auth/verify" "" "Authorization: Bearer $token"
         sleep 1
     else
         log_with_timestamp "⚠️ Skipping verification for ${users[$i]} - no valid token"
@@ -134,10 +132,8 @@ for i in "${!tokens[@]}"; do
     if [ -n "$token" ] && [ "$token" != "null" ]; then
         for scenario in "${payment_scenarios[@]}"; do
             IFS='|' read -r amount recipient description <<< "$scenario"
-            
             log_with_timestamp "💰 Processing payment: $amount to $recipient"
             json_payload=$(printf '{"amount":%s,"recipient":"%s","description":"%s"}' "$amount" "$recipient" "$description")
-            
             make_api_call "POST" "/payment/process" "$json_payload" "Authorization: Bearer $token"
             sleep 2
         done
