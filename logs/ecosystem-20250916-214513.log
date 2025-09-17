@@ -1,0 +1,85 @@
+[2025-09-16 21:45:13] 🚀 Starting PayPal Clone Ecosystem Test Suite
+[2025-09-16 21:45:13] ==============================================
+[2025-09-16 21:45:13] 
+[2025-09-16 21:45:13] 🏥 STEP 1: Health Checks
+[2025-09-16 21:45:13] ========================
+[2025-09-16 21:45:13] 🔄 API Call: GET http://localhost:8080/api/auth/health
+[2025-09-16 21:45:13] 📥 Response: 
+[2025-09-16 21:45:14] 🔄 API Call: GET http://localhost:8080/api/payment/health
+[2025-09-16 21:45:14] 📥 Response: {"status":"healthy","service":"payment-service","timestamp":"2025-09-16T16:15:14.309Z"}
+[2025-09-16 21:45:15] 🔄 API Call: GET http://localhost:8080/api/notification/health
+[2025-09-16 21:45:15] 📥 Response: {"status":"healthy","service":"notification-service","timestamp":"2025-09-16T16:15:15.350Z"}
+[2025-09-16 21:45:17] 
+[2025-09-16 21:45:17] 👤 STEP 2: User Registration
+[2025-09-16 21:45:17] ============================
+[2025-09-16 21:45:17] 📝 Registering user: alice@paypal.com
+[2025-09-16 21:45:17] 🔄 API Call: POST http://localhost:8080/api/auth/register
+[2025-09-16 21:45:17] 📥 Response: {"message":"User registered successfully","userId":1758039317675}
+[2025-09-16 21:45:18] 📝 Registering user: bob@paypal.com
+[2025-09-16 21:45:18] 🔄 API Call: POST http://localhost:8080/api/auth/register
+[2025-09-16 21:45:18] 📥 Response: {"message":"User registered successfully","userId":1758039318845}
+[2025-09-16 21:45:19] 📝 Registering user: charlie@paypal.com
+[2025-09-16 21:45:19] 🔄 API Call: POST http://localhost:8080/api/auth/register
+[2025-09-16 21:45:20] 📥 Response: {"message":"User registered successfully","userId":1758039320026}
+[2025-09-16 21:45:21] 
+[2025-09-16 21:45:21] 🔐 STEP 3: User Login
+[2025-09-16 21:45:21] =====================
+[2025-09-16 21:45:21] 🔑 Logging in user: alice@paypal.com
+[2025-09-16 21:45:21] 🔄 API Call: POST http://localhost:8080/api/auth/login
+[2025-09-16 21:45:21] 📥 Response: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3NTgwMzkzMTc2NzUsImVtYWlsIjoiYWxpY2VAcGF5cGFsLmNvbSIsImlhdCI6MTc1ODAzOTMyMSwiZXhwIjoxNzU4MTI1NzIxfQ.GKqSCTT_9b71VEHLGflYQEUROGrnCMjuA2yGyWeIkTA","userId":1758039317675}
+[2025-09-16 21:45:21] ✅ Token extracted successfully for alice@paypal.com (token=eyJhbGci...)
+[2025-09-16 21:45:22] 🔑 Logging in user: bob@paypal.com
+[2025-09-16 21:45:22] 🔄 API Call: POST http://localhost:8080/api/auth/login
+[2025-09-16 21:45:22] 📥 Response: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3NTgwMzkzMTg4NDUsImVtYWlsIjoiYm9iQHBheXBhbC5jb20iLCJpYXQiOjE3NTgwMzkzMjIsImV4cCI6MTc1ODEyNTcyMn0.LKkzkYnmVvTZjqJPi3dWNUiIM5FNmhlISAJ8ZJ8j8Vc","userId":1758039318845}
+[2025-09-16 21:45:22] ✅ Token extracted successfully for bob@paypal.com (token=eyJhbGci...)
+[2025-09-16 21:45:23] 🔑 Logging in user: charlie@paypal.com
+[2025-09-16 21:45:23] 🔄 API Call: POST http://localhost:8080/api/auth/login
+[2025-09-16 21:45:23] 📥 Response: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3NTgwMzkzMjAwMjYsImVtYWlsIjoiY2hhcmxpZUBwYXlwYWwuY29tIiwiaWF0IjoxNzU4MDM5MzIzLCJleHAiOjE3NTgxMjU3MjN9.061Ch4r6yj0xAPTERd2dbeDPc-9NwvQSMyC_8h9TO3M","userId":1758039320026}
+[2025-09-16 21:45:23] ✅ Token extracted successfully for charlie@paypal.com (token=eyJhbGci...)
+[2025-09-16 21:45:24] 
+[2025-09-16 21:45:24] ✅ STEP 4: Token Verification
+[2025-09-16 21:45:24] =============================
+[2025-09-16 21:45:24] 🎫 Verifying token for alice@paypal.com
+[2025-09-16 21:45:24] 🔄 API Call: POST http://localhost:8080/api/auth/verify
+[2025-09-16 21:45:24] 📥 Response: {"valid":false,"error":"Invalid token"}
+[2025-09-16 21:45:25] 🎫 Verifying token for bob@paypal.com
+[2025-09-16 21:45:25] 🔄 API Call: POST http://localhost:8080/api/auth/verify
+[2025-09-16 21:45:25] 📥 Response: {"valid":false,"error":"Invalid token"}
+[2025-09-16 21:45:26] 🎫 Verifying token for charlie@paypal.com
+[2025-09-16 21:45:26] 🔄 API Call: POST http://localhost:8080/api/auth/verify
+[2025-09-16 21:45:26] 📥 Response: {"valid":false,"error":"Invalid token"}
+[2025-09-16 21:45:27] 
+[2025-09-16 21:45:27] 💳 STEP 5: Payment Processing
+[2025-09-16 21:45:27] =============================
+[2025-09-16 21:45:27] 💰 Processing payment: 50.00 to john@example.com
+[2025-09-16 21:45:27] 🔄 API Call: POST http://localhost:8080/api/payment/process
+[2025-09-16 21:45:31] 📥 Response: {"error":"No token provided"}
+[2025-09-16 21:45:33] 💰 Processing payment: 150.75 to sarah@store.com
+[2025-09-16 21:45:33] 🔄 API Call: POST http://localhost:8080/api/payment/process
+[2025-09-16 21:45:37] 📥 Response: {"error":"No token provided"}
+[2025-09-16 21:45:39] 💰 Processing payment: 25.50 to mike@restaurant.com
+[2025-09-16 21:45:39] 🔄 API Call: POST http://localhost:8080/api/payment/process
+[2025-09-16 21:45:43] 📥 Response: {"error":"No token provided"}
+[2025-09-16 21:45:45] 💰 Processing payment: 300.00 to landlord@apartments.com
+[2025-09-16 21:45:45] 🔄 API Call: POST http://localhost:8080/api/payment/process
+[2025-09-16 21:45:49] 📥 Response: {"error":"No token provided"}
+[2025-09-16 21:45:51] 💰 Processing payment: 75.25 to utilities@company.com
+[2025-09-16 21:45:51] 🔄 API Call: POST http://localhost:8080/api/payment/process
+[2025-09-16 21:45:55] 📥 Response: {"error":"No token provided"}
+[2025-09-16 21:45:57] 
+[2025-09-16 21:45:57] 📊 STEP 6: Payment History
+[2025-09-16 21:45:57] ==========================
+[2025-09-16 21:45:57] 📈 Fetching payment history
+[2025-09-16 21:45:57] 🔄 API Call: GET http://localhost:8080/api/payment/history
+[2025-09-16 21:46:01] 📥 Response: {"error":"No token provided"}
+[2025-09-16 21:46:01] 
+[2025-09-16 21:46:01] ❌ STEP 7: Error Scenarios
+[2025-09-16 21:46:01] ==========================
+[2025-09-16 21:46:01] 🚫 Testing invalid login
+[2025-09-16 21:46:01] 🔄 API Call: POST http://localhost:8080/api/auth/login
+[2025-09-16 21:46:01] 📥 Response: {"error":"Invalid credentials"}
+[2025-09-16 21:46:02] 🚫 Testing payment without token
+[2025-09-16 21:46:02] 🔄 API Call: POST http://localhost:8080/api/payment/process
+[2025-09-16 21:46:02] 📥 Response: {"error":"No token provided"}
+[2025-09-16 21:46:03] 🚫 Testing invalid token
+[2025-09-16 21:46:03] 🔄 API Call: POST http://localhost:8080/api/payment/process

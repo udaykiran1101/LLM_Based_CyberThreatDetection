@@ -1,0 +1,23 @@
+[2025-09-16 21:37:30] 🚀 Starting PayPal Clone Ecosystem Test Suite
+[2025-09-16 21:37:30] ==============================================
+[2025-09-16 21:37:30] 
+[2025-09-16 21:37:30] 🏥 STEP 1: Health Checks
+[2025-09-16 21:37:30] ========================
+[2025-09-16 21:37:30] 🔄 API Call: GET /auth/health
+[2025-09-16 21:37:30] 📥 Response: 
+[2025-09-16 21:37:31] 🔄 API Call: GET /payment/health
+[2025-09-16 21:37:31] 📥 Response: {"status":"healthy","service":"payment-service","timestamp":"2025-09-16T16:07:31.465Z"}
+[2025-09-16 21:37:32] 🔄 API Call: GET /notification/health
+[2025-09-16 21:37:32] 📥 Response: {"status":"healthy","service":"notification-service","timestamp":"2025-09-16T16:07:32.507Z"}
+[2025-09-16 21:37:34] 
+[2025-09-16 21:37:34] 👤 STEP 2: User Registration
+[2025-09-16 21:37:34] ============================
+[2025-09-16 21:37:34] 📝 Registering user: alice@paypal.com
+[2025-09-16 21:37:34] 🔄 API Call: POST /auth/register
+[2025-09-16 21:37:34] 📥 Response: {"message":"User registered successfully","userId":1758038854736}
+[2025-09-16 21:37:35] 📝 Registering user: bob@paypal.com
+[2025-09-16 21:37:35] 🔄 API Call: POST /auth/register
+[2025-09-16 21:37:35] 📥 Response: {"message":"User registered successfully","userId":1758038855919}
+[2025-09-16 21:37:36] 📝 Registering user: charlie@paypal.com
+[2025-09-16 21:37:36] 🔄 API Call: POST /auth/register
+[2025-09-16 21:37:37] 📥 Response: {"message":"User registered successfully","userId":1758038857083}

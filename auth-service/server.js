@@ -6,7 +6,24 @@ const axios = require('axios');
 const app = express();
 app.use(express.json());
 
-const JWT_SECRET = 'your-secret-key';
+const fs = require('fs');
+let JWT_SECRET;
+
+try {
+    if (process.env.JWT_SECRET_FILE) {
+        JWT_SECRET = fs.readFileSync(process.env.JWT_SECRET_FILE, 'utf8').trim();
+        console.log('[AUTH-SERVICE] Loaded JWT secret from file');
+    } else if (process.env.JWT_SECRET) {
+        JWT_SECRET = process.env.JWT_SECRET;
+        console.log('[AUTH-SERVICE] Using JWT secret from environment variable');
+    } else {
+        console.error('[AUTH-SERVICE] Neither JWT_SECRET_FILE nor JWT_SECRET environment variable is set');
+        process.exit(1);
+    }
+} catch (error) {
+    console.error('[AUTH-SERVICE] Failed to load JWT secret:', error);
+    process.exit(1);
+}
 const users = []; // In-memory store for demo
 
 // Health check
@@ -57,15 +74,36 @@ app.post('/login', async (req, res) => {
 // Verify token
 app.post('/verify', (req, res) => {
     try {
-        const { token } = req.body;
+        console.log('[AUTH-SERVICE] Headers received:', JSON.stringify(req.headers, null, 2));
+        console.log('[AUTH-SERVICE] Body received:', JSON.stringify(req.body, null, 2));
+        console.log('[AUTH-SERVICE] Using JWT_SECRET:', JWT_SECRET);
+        
+        // Accept token from Authorization header or body
+        const authHeader = req.headers.authorization;
+        console.log('[AUTH-SERVICE] Authorization header:', authHeader);
+        
+        const token = authHeader?.split(' ')[1] || req.body.token;
+        if (!token) {
+            console.log('[AUTH-SERVICE] No token provided in request');
+            return res.status(401).json({ valid: false, error: 'No token provided' });
+        }
+
+        console.log('[AUTH-SERVICE] Token to verify:', token);
+
         const decoded = jwt.verify(token, JWT_SECRET);
+        console.log('[AUTH-SERVICE] Token decoded:', JSON.stringify(decoded, null, 2));
         console.log(`[AUTH-SERVICE] Token verified for user: ${decoded.email}`);
+        
         res.json({ valid: true, userId: decoded.userId, email: decoded.email });
     } catch (error) {
-        console.log('[AUTH-SERVICE] Token verification failed');
-        res.status(401).json({ valid: false, error: 'Invalid token' });
+        console.error('[AUTH-SERVICE] Token verification failed');
+        console.error('[AUTH-SERVICE] Error type:', error.name);
+        console.error('[AUTH-SERVICE] Error message:', error.message);
+        console.error('[AUTH-SERVICE] Stack trace:', error.stack);
+        res.status(401).json({ valid: false, error: 'Invalid token', details: error.message });
     }
 });
+
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {

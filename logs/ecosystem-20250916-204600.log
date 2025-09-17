@@ -1,0 +1,88 @@
+[2025-09-16 20:46:00] 🚀 Starting PayPal Clone Ecosystem Test Suite
+[2025-09-16 20:46:00] ==============================================
+[2025-09-16 20:46:00] 
+[2025-09-16 20:46:00] 🏥 STEP 1: Health Checks
+[2025-09-16 20:46:00] ========================
+[2025-09-16 20:46:00] 🔄 API Call: GET /auth/health
+[2025-09-16 20:46:00] 📥 Response: {"status":"healthy","service":"auth-service","timestamp":"2025-09-16T15:16:00.309Z"}
+[2025-09-16 20:46:01] 🔄 API Call: GET /payment/health
+[2025-09-16 20:46:01] 📥 Response: {"status":"healthy","service":"payment-service","timestamp":"2025-09-16T15:16:01.339Z"}
+[2025-09-16 20:46:02] 🔄 API Call: GET /notification/health
+[2025-09-16 20:46:02] 📥 Response: {"status":"healthy","service":"notification-service","timestamp":"2025-09-16T15:16:02.368Z"}
+[2025-09-16 20:46:04] 
+[2025-09-16 20:46:04] 👤 STEP 2: User Registration
+[2025-09-16 20:46:04] ============================
+[2025-09-16 20:46:04] 📝 Registering user: alice@paypal.com
+[2025-09-16 20:46:04] 🔄 API Call: POST /auth/register
+[2025-09-16 20:46:04] 📥 Response: {"message":"User registered successfully","userId":1758035764542}
+[2025-09-16 20:46:05] 📝 Registering user: bob@paypal.com
+[2025-09-16 20:46:05] 🔄 API Call: POST /auth/register
+[2025-09-16 20:46:05] 📥 Response: {"message":"User registered successfully","userId":1758035765710}
+[2025-09-16 20:46:06] 📝 Registering user: charlie@paypal.com
+[2025-09-16 20:46:06] 🔄 API Call: POST /auth/register
+[2025-09-16 20:46:06] 📥 Response: {"message":"User registered successfully","userId":1758035766886}
+[2025-09-16 20:46:07] 
+[2025-09-16 20:46:07] 🔐 STEP 3: User Login
+[2025-09-16 20:46:07] =====================
+[2025-09-16 20:46:07] 🔑 Logging in user: alice@paypal.com
+[2025-09-16 20:46:07] 🔄 API Call: POST /auth/login
+[2025-09-16 20:46:08] 📥 Response: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3NTgwMzU1MDIyMzUsImVtYWlsIjoiYWxpY2VAcGF5cGFsLmNvbSIsImlhdCI6MTc1ODAzNTc2OCwiZXhwIjoxNzU4MTIyMTY4fQ.MwexP_G2_-CUsZ1zsXvHQd85SNQj-OIXRE4xyNrDhgI","userId":1758035502235}
+[2025-09-16 20:46:09] 🔑 Logging in user: bob@paypal.com
+[2025-09-16 20:46:09] 🔄 API Call: POST /auth/login
+[2025-09-16 20:46:09] 📥 Response: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3NTgwMzU1MDM0MDUsImVtYWlsIjoiYm9iQHBheXBhbC5jb20iLCJpYXQiOjE3NTgwMzU3NjksImV4cCI6MTc1ODEyMjE2OX0.vl3RGcSAALbq8f-VGu6qDUBrTbLxwY6RXD8OMNFXpuQ","userId":1758035503405}
+[2025-09-16 20:46:10] 🔑 Logging in user: charlie@paypal.com
+[2025-09-16 20:46:10] 🔄 API Call: POST /auth/login
+[2025-09-16 20:46:10] 📥 Response: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3NTgwMzU1MDQ1NzYsImVtYWlsIjoiY2hhcmxpZUBwYXlwYWwuY29tIiwiaWF0IjoxNzU4MDM1NzcwLCJleHAiOjE3NTgxMjIxNzB9.sjmYsMJLGhxlX1AixOz3v4MQph-Zzihzo5sbemphdBs","userId":1758035504576}
+[2025-09-16 20:46:11] 
+[2025-09-16 20:46:11] ✅ STEP 4: Token Verification
+[2025-09-16 20:46:11] =============================
+[2025-09-16 20:46:11] 🎫 Verifying token for alice@paypal.com
+[2025-09-16 20:46:11] 🔄 API Call: POST /auth/verify
+[2025-09-16 20:46:11] 📥 Response: <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error</title>
+</head>
+<body>
+<pre>SyntaxError: Unexpected token <br> in JSON at position 205<br> &nbsp; &nbsp;at JSON.parse (&lt;anonymous&gt;)<br> &nbsp; &nbsp;at parse (/app/node_modules/body-parser/lib/types/json.js:92:19)<br> &nbsp; &nbsp;at /app/node_modules/body-parser/lib/read.js:128:18<br> &nbsp; &nbsp;at AsyncResource.runInAsyncScope (node:async_hooks:203:9)<br> &nbsp; &nbsp;at invokeCallback (/app/node_modules/raw-body/index.js:238:16)<br> &nbsp; &nbsp;at done (/app/node_modules/raw-body/index.js:227:7)<br> &nbsp; &nbsp;at IncomingMessage.onEnd (/app/node_modules/raw-body/index.js:287:7)<br> &nbsp; &nbsp;at IncomingMessage.emit (node:events:525:35)<br> &nbsp; &nbsp;at endReadableNT (node:internal/streams/readable:1358:12)<br> &nbsp; &nbsp;at processTicksAndRejections (node:internal/process/task_queues:83:21)</pre>
+</body>
+</html>
+[2025-09-16 20:46:12] 🎫 Verifying token for bob@paypal.com
+[2025-09-16 20:46:12] 🔄 API Call: POST /auth/verify
+[2025-09-16 20:46:12] 📥 Response: <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error</title>
+</head>
+<body>
+<pre>SyntaxError: Unexpected token <br> in JSON at position 202<br> &nbsp; &nbsp;at JSON.parse (&lt;anonymous&gt;)<br> &nbsp; &nbsp;at parse (/app/node_modules/body-parser/lib/types/json.js:92:19)<br> &nbsp; &nbsp;at /app/node_modules/body-parser/lib/read.js:128:18<br> &nbsp; &nbsp;at AsyncResource.runInAsyncScope (node:async_hooks:203:9)<br> &nbsp; &nbsp;at invokeCallback (/app/node_modules/raw-body/index.js:238:16)<br> &nbsp; &nbsp;at done (/app/node_modules/raw-body/index.js:227:7)<br> &nbsp; &nbsp;at IncomingMessage.onEnd (/app/node_modules/raw-body/index.js:287:7)<br> &nbsp; &nbsp;at IncomingMessage.emit (node:events:525:35)<br> &nbsp; &nbsp;at endReadableNT (node:internal/streams/readable:1358:12)<br> &nbsp; &nbsp;at processTicksAndRejections (node:internal/process/task_queues:83:21)</pre>
+</body>
+</html>
+[2025-09-16 20:46:13] 🎫 Verifying token for charlie@paypal.com
+[2025-09-16 20:46:13] 🔄 API Call: POST /auth/verify
+[2025-09-16 20:46:13] 📥 Response: <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error</title>
+</head>
+<body>
+<pre>SyntaxError: Unexpected token <br> in JSON at position 207<br> &nbsp; &nbsp;at JSON.parse (&lt;anonymous&gt;)<br> &nbsp; &nbsp;at parse (/app/node_modules/body-parser/lib/types/json.js:92:19)<br> &nbsp; &nbsp;at /app/node_modules/body-parser/lib/read.js:128:18<br> &nbsp; &nbsp;at AsyncResource.runInAsyncScope (node:async_hooks:203:9)<br> &nbsp; &nbsp;at invokeCallback (/app/node_modules/raw-body/index.js:238:16)<br> &nbsp; &nbsp;at done (/app/node_modules/raw-body/index.js:227:7)<br> &nbsp; &nbsp;at IncomingMessage.onEnd (/app/node_modules/raw-body/index.js:287:7)<br> &nbsp; &nbsp;at IncomingMessage.emit (node:events:525:35)<br> &nbsp; &nbsp;at endReadableNT (node:internal/streams/readable:1358:12)<br> &nbsp; &nbsp;at processTicksAndRejections (node:internal/process/task_queues:83:21)</pre>
+</body>
+</html>
+[2025-09-16 20:46:14] 
+[2025-09-16 20:46:14] 💳 STEP 5: Payment Processing
+[2025-09-16 20:46:14] =============================
+[2025-09-16 20:46:14] 💰 Processing payment: 50.00 to john@example.com
+[2025-09-16 20:46:14] 🔄 API Call: POST /payment/process
+[2025-09-16 20:46:18] 📥 Response: {"error":"No token provided"}
+[2025-09-16 20:46:20] 💰 Processing payment: 150.75 to sarah@store.com
+[2025-09-16 20:46:20] 🔄 API Call: POST /payment/process
+[2025-09-16 20:46:24] 📥 Response: {"error":"No token provided"}
+[2025-09-16 20:46:26] 💰 Processing payment: 25.50 to mike@restaurant.com
+[2025-09-16 20:46:26] 🔄 API Call: POST /payment/process
+[2025-09-16 20:46:30] 📥 Response: {"error":"No token provided"}
+[2025-09-16 20:46:32] 💰 Processing payment: 300.00 to landlord@apartments.com
+[2025-09-16 20:46:32] 🔄 API Call: POST /payment/process

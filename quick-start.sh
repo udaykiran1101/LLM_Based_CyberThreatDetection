@@ -5,7 +5,7 @@ echo "============================="
 echo ""
 
 # Check if ecosystem is already running
-if curl -s http://localhost:8080/health >/dev/null 2>&1; then
+if curl -s http://localhost:8080/api/health >/dev/null 2>&1; then
     echo "✅ Ecosystem is already running!"
 else
     echo "🔧 Starting ecosystem..."

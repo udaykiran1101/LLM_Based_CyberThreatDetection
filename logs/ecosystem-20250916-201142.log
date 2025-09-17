@@ -1,0 +1,70 @@
+[2025-09-16 20:11:42] 🚀 Starting PayPal Clone Ecosystem Test Suite
+[2025-09-16 20:11:42] ==============================================
+[2025-09-16 20:11:42] 
+[2025-09-16 20:11:42] 🏥 STEP 1: Health Checks
+[2025-09-16 20:11:42] ========================
+[2025-09-16 20:11:42] 🔄 API Call: GET /auth/health
+[2025-09-16 20:11:42] 📥 Response: 
+[2025-09-16 20:11:43] 🔄 API Call: GET /payment/health
+[2025-09-16 20:11:43] 📥 Response: 
+[2025-09-16 20:11:44] 🔄 API Call: GET /notification/health
+[2025-09-16 20:11:44] 📥 Response: 
+[2025-09-16 20:11:46] 
+[2025-09-16 20:11:46] 👤 STEP 2: User Registration
+[2025-09-16 20:11:46] ============================
+[2025-09-16 20:11:46] 📝 Registering user: alice@paypal.com
+[2025-09-16 20:11:46] 🔄 API Call: POST /auth/register
+[2025-09-16 20:11:46] 📥 Response: 
+[2025-09-16 20:11:47] 📝 Registering user: bob@paypal.com
+[2025-09-16 20:11:47] 🔄 API Call: POST /auth/register
+[2025-09-16 20:11:47] 📥 Response: 
+[2025-09-16 20:11:48] 📝 Registering user: charlie@paypal.com
+[2025-09-16 20:11:48] 🔄 API Call: POST /auth/register
+[2025-09-16 20:11:48] 📥 Response: 
+[2025-09-16 20:11:49] 
+[2025-09-16 20:11:49] 🔐 STEP 3: User Login
+[2025-09-16 20:11:49] =====================
+[2025-09-16 20:11:49] 🔑 Logging in user: alice@paypal.com
+[2025-09-16 20:11:49] 🔄 API Call: POST /auth/login
+[2025-09-16 20:11:49] 📥 Response: 
+[2025-09-16 20:11:50] 🔑 Logging in user: bob@paypal.com
+[2025-09-16 20:11:50] 🔄 API Call: POST /auth/login
+[2025-09-16 20:11:50] 📥 Response: 
+[2025-09-16 20:11:51] 🔑 Logging in user: charlie@paypal.com
+[2025-09-16 20:11:51] 🔄 API Call: POST /auth/login
+[2025-09-16 20:11:51] 📥 Response: 
+[2025-09-16 20:11:52] 
+[2025-09-16 20:11:52] ✅ STEP 4: Token Verification
+[2025-09-16 20:11:52] =============================
+[2025-09-16 20:11:52] 
+[2025-09-16 20:11:52] 💳 STEP 5: Payment Processing
+[2025-09-16 20:11:52] =============================
+[2025-09-16 20:11:52] 
+[2025-09-16 20:11:52] 📊 STEP 6: Payment History
+[2025-09-16 20:11:52] ==========================
+[2025-09-16 20:11:52] 
+[2025-09-16 20:11:52] ❌ STEP 7: Error Scenarios
+[2025-09-16 20:11:52] ==========================
+[2025-09-16 20:11:52] 🚫 Testing invalid login
+[2025-09-16 20:11:52] 🔄 API Call: POST /auth/login
+[2025-09-16 20:11:52] 📥 Response: 
+[2025-09-16 20:11:53] 🚫 Testing payment without token
+[2025-09-16 20:11:53] 🔄 API Call: POST /payment/process
+[2025-09-16 20:11:53] 📥 Response: 
+[2025-09-16 20:11:54] 🚫 Testing invalid token
+[2025-09-16 20:11:54] 🔄 API Call: POST /payment/process
+[2025-09-16 20:11:56] 📥 Response: 
+[2025-09-16 20:11:57] 
+[2025-09-16 20:11:57] 🔄 STEP 8: Inter-Service Communication
+[2025-09-16 20:11:57] ======================================
+[2025-09-16 20:11:57] 
+[2025-09-16 20:11:57] ✅ ECOSYSTEM TEST COMPLETED
+[2025-09-16 20:11:57] ============================
+[2025-09-16 20:11:57] 📊 Total API calls made: 12
+[2025-09-16 20:11:57] 📝 Log file saved: logs/ecosystem-20250916-201142.log
+[2025-09-16 20:11:57] 
+[2025-09-16 20:11:57] 🐳 Docker container logs:
+[2025-09-16 20:11:57]   - docker-compose logs auth-service
+[2025-09-16 20:11:57]   - docker-compose logs payment-service
+[2025-09-16 20:11:57]   - docker-compose logs notification-service
+[2025-09-16 20:11:57]   - docker-compose logs api-gateway
