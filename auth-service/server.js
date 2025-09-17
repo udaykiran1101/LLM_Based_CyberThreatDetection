@@ -6,24 +6,11 @@ const axios = require('axios');
 const app = express();
 app.use(express.json());
 
-const fs = require('fs');
-let JWT_SECRET;
+// Use a constant secret for development (in production, use environment variables or secure storage)
+const JWT_SECRET = 'very-secure-jwt-secret-that-stays-constant-across-restarts-2025';
 
-try {
-    if (process.env.JWT_SECRET_FILE) {
-        JWT_SECRET = fs.readFileSync(process.env.JWT_SECRET_FILE, 'utf8').trim();
-        console.log('[AUTH-SERVICE] Loaded JWT secret from file');
-    } else if (process.env.JWT_SECRET) {
-        JWT_SECRET = process.env.JWT_SECRET;
-        console.log('[AUTH-SERVICE] Using JWT secret from environment variable');
-    } else {
-        console.error('[AUTH-SERVICE] Neither JWT_SECRET_FILE nor JWT_SECRET environment variable is set');
-        process.exit(1);
-    }
-} catch (error) {
-    console.error('[AUTH-SERVICE] Failed to load JWT secret:', error);
-    process.exit(1);
-}
+// Log the secret being used (only in development!)
+console.log('[AUTH-SERVICE] Using JWT_SECRET:', JWT_SECRET);
 const users = []; // In-memory store for demo
 
 // Health check
@@ -74,32 +61,41 @@ app.post('/login', async (req, res) => {
 // Verify token
 app.post('/verify', (req, res) => {
     try {
-        console.log('[AUTH-SERVICE] Headers received:', JSON.stringify(req.headers, null, 2));
-        console.log('[AUTH-SERVICE] Body received:', JSON.stringify(req.body, null, 2));
-        console.log('[AUTH-SERVICE] Using JWT_SECRET:', JWT_SECRET);
+        const tokenFromHeader = req.headers.authorization?.split(' ')[1];
+        const tokenFromBody = req.body.token;
+        const token = tokenFromHeader || tokenFromBody;
+
+        console.log('[AUTH-SERVICE] Request debug:');
+        console.log('- Headers:', JSON.stringify(req.headers, null, 2));
+        console.log('- Body:', JSON.stringify(req.body, null, 2));
+        console.log('- Token from header:', tokenFromHeader);
+        console.log('- Token from body:', tokenFromBody);
+        console.log('- Final token:', token);
         
-        // Accept token from Authorization header or body
-        const authHeader = req.headers.authorization;
-        console.log('[AUTH-SERVICE] Authorization header:', authHeader);
-        
-        const token = authHeader?.split(' ')[1] || req.body.token;
         if (!token) {
-            console.log('[AUTH-SERVICE] No token provided in request');
+            console.log('[AUTH-SERVICE] No token provided');
             return res.status(401).json({ valid: false, error: 'No token provided' });
         }
 
-        console.log('[AUTH-SERVICE] Token to verify:', token);
-
-        const decoded = jwt.verify(token, JWT_SECRET);
-        console.log('[AUTH-SERVICE] Token decoded:', JSON.stringify(decoded, null, 2));
-        console.log(`[AUTH-SERVICE] Token verified for user: ${decoded.email}`);
+        // Use the same JWT_SECRET that was used to sign the token
+        console.log('[AUTH-SERVICE] About to verify token with secret:', JWT_SECRET);
         
-        res.json({ valid: true, userId: decoded.userId, email: decoded.email });
+        try {
+            const decoded = jwt.verify(token, JWT_SECRET, { algorithms: ['HS256'] });
+            console.log('[AUTH-SERVICE] Successfully decoded token:', decoded);
+            console.log(`[AUTH-SERVICE] Token verified for user: ${decoded.email}`);
+            res.json({ valid: true, userId: decoded.userId, email: decoded.email });
+        } catch (jwtError) {
+            console.error('[AUTH-SERVICE] JWT verification error:');
+            console.error('- Error name:', jwtError.name);
+            console.error('- Error message:', jwtError.message);
+            console.error('- JWT used:', token.split('.').slice(0, 2).join('.'));
+            throw jwtError;
+        }
     } catch (error) {
         console.error('[AUTH-SERVICE] Token verification failed');
-        console.error('[AUTH-SERVICE] Error type:', error.name);
-        console.error('[AUTH-SERVICE] Error message:', error.message);
-        console.error('[AUTH-SERVICE] Stack trace:', error.stack);
+        console.error('- Error name:', error.name);
+        console.error('- Error message:', error.message);
         res.status(401).json({ valid: false, error: 'Invalid token', details: error.message });
     }
 });
