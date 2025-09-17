@@ -1,0 +1,92 @@
+[2025-09-17 22:46:56] 🚀 Starting PayPal Clone Ecosystem Test Suite
+[2025-09-17 22:46:56] ==============================================
+[2025-09-17 22:46:56] 
+[2025-09-17 22:46:56] 🏥 STEP 1: Health Checks
+[2025-09-17 22:46:56] ========================
+[2025-09-17 22:46:56] 🔄 API Call: GET http://localhost:8080/api/auth/health
+[2025-09-17 22:46:56] 📥 Response: {"status":"healthy","service":"auth-service","timestamp":"2025-09-17T17:16:56.074Z"}
+[2025-09-17 22:46:57] 🔄 API Call: GET http://localhost:8080/api/payment/health
+[2025-09-17 22:46:57] 📥 Response: {"status":"healthy","service":"payment-service","timestamp":"2025-09-17T17:16:57.105Z"}
+[2025-09-17 22:46:58] 🔄 API Call: GET http://localhost:8080/api/notification/health
+[2025-09-17 22:46:58] 📥 Response: {"status":"healthy","service":"notification-service","timestamp":"2025-09-17T17:16:58.132Z"}
+[2025-09-17 22:47:00] 
+[2025-09-17 22:47:00] 👤 STEP 2: User Registration
+[2025-09-17 22:47:00] ============================
+[2025-09-17 22:47:00] 📝 Registering user: alice@paypal.com
+[2025-09-17 22:47:00] 🔄 API Call: POST http://localhost:8080/api/auth/register
+[2025-09-17 22:47:00] 📥 Response: {"message":"User registered successfully","userId":1758129420316}
+[2025-09-17 22:47:01] 📝 Registering user: bob@paypal.com
+[2025-09-17 22:47:01] 🔄 API Call: POST http://localhost:8080/api/auth/register
+[2025-09-17 22:47:01] 📥 Response: {"message":"User registered successfully","userId":1758129421476}
+[2025-09-17 22:47:02] 📝 Registering user: charlie@paypal.com
+[2025-09-17 22:47:02] 🔄 API Call: POST http://localhost:8080/api/auth/register
+[2025-09-17 22:47:02] 📥 Response: {"message":"User registered successfully","userId":1758129422638}
+[2025-09-17 22:47:03] 
+[2025-09-17 22:47:03] 🔐 STEP 3: User Login
+[2025-09-17 22:47:03] =====================
+[2025-09-17 22:47:03] 🔑 Logging in user: alice@paypal.com
+[2025-09-17 22:47:03] 🔄 API Call: POST http://localhost:8080/api/auth/login
+[2025-09-17 22:47:03] 📥 Response: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3NTgxMjc5NTM0NTAsImVtYWlsIjoiYWxpY2VAcGF5cGFsLmNvbSIsImlhdCI6MTc1ODEyOTQyMywiZXhwIjoxNzU4MjE1ODIzfQ.PfHiZRvQtbXLnPgoFILfxxWTzZnifYw1BaRJCiCxvfg","userId":1758127953450}
+[2025-09-17 22:47:03] 🐞 Raw login response: [2025-09-17 22:47:03] 🔄 API Call: POST http://localhost:8080/api/auth/login
+[2025-09-17 22:47:03] 📥 Response: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3NTgxMjc5NTM0NTAsImVtYWlsIjoiYWxpY2VAcGF5cGFsLmNvbSIsImlhdCI6MTc1ODEyOTQyMywiZXhwIjoxNzU4MjE1ODIzfQ.PfHiZRvQtbXLnPgoFILfxxWTzZnifYw1BaRJCiCxvfg","userId":1758127953450}
+{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3NTgxMjc5NTM0NTAsImVtYWlsIjoiYWxpY2VAcGF5cGFsLmNvbSIsImlhdCI6MTc1ODEyOTQyMywiZXhwIjoxNzU4MjE1ODIzfQ.PfHiZRvQtbXLnPgoFILfxxWTzZnifYw1BaRJCiCxvfg","userId":1758127953450}
+[2025-09-17 22:47:03] 🐞 Extracted token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3NTgxMjc5NTM0NTAsImVtYWlsIjoiYWxpY2VAcGF5cGFsLmNvbSIsImlhdCI6MTc1ODEyOTQyMywiZXhwIjoxNzU4MjE1ODIzfQ.PfHiZRvQtbXLnPgoFILfxxWTzZnifYw1BaRJCiCxvfg
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3NTgxMjc5NTM0NTAsImVtYWlsIjoiYWxpY2VAcGF5cGFsLmNvbSIsImlhdCI6MTc1ODEyOTQyMywiZXhwIjoxNzU4MjE1ODIzfQ.PfHiZRvQtbXLnPgoFILfxxWTzZnifYw1BaRJCiCxvfg
+[2025-09-17 22:47:03] ✅ Token extracted successfully for alice@paypal.com
+[2025-09-17 22:47:03] 🔒 Token details: eyJhbGciOiJIUzI1NiIs...
+[2025-09-17 22:47:03] 🔑 Verifying token immediately after login
+[2025-09-17 22:47:03] 🔄 API Call: POST http://localhost:8080/api/auth/verify
+[2025-09-17 22:47:03] 📥 Response: {"valid":false,"error":"Invalid token","details":"jwt malformed"}
+[2025-09-17 22:47:04] 🔑 Logging in user: bob@paypal.com
+[2025-09-17 22:47:04] 🔄 API Call: POST http://localhost:8080/api/auth/login
+[2025-09-17 22:47:05] 📥 Response: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3NTgxMjc5NTQ3NzksImVtYWlsIjoiYm9iQHBheXBhbC5jb20iLCJpYXQiOjE3NTgxMjk0MjUsImV4cCI6MTc1ODIxNTgyNX0.LvXRUvU2XPi66l6HSX0JbEjj6fW5RVU15pAr29GtGGw","userId":1758127954779}
+[2025-09-17 22:47:05] 🐞 Raw login response: [2025-09-17 22:47:04] 🔄 API Call: POST http://localhost:8080/api/auth/login
+[2025-09-17 22:47:05] 📥 Response: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3NTgxMjc5NTQ3NzksImVtYWlsIjoiYm9iQHBheXBhbC5jb20iLCJpYXQiOjE3NTgxMjk0MjUsImV4cCI6MTc1ODIxNTgyNX0.LvXRUvU2XPi66l6HSX0JbEjj6fW5RVU15pAr29GtGGw","userId":1758127954779}
+{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3NTgxMjc5NTQ3NzksImVtYWlsIjoiYm9iQHBheXBhbC5jb20iLCJpYXQiOjE3NTgxMjk0MjUsImV4cCI6MTc1ODIxNTgyNX0.LvXRUvU2XPi66l6HSX0JbEjj6fW5RVU15pAr29GtGGw","userId":1758127954779}
+[2025-09-17 22:47:05] 🐞 Extracted token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3NTgxMjc5NTQ3NzksImVtYWlsIjoiYm9iQHBheXBhbC5jb20iLCJpYXQiOjE3NTgxMjk0MjUsImV4cCI6MTc1ODIxNTgyNX0.LvXRUvU2XPi66l6HSX0JbEjj6fW5RVU15pAr29GtGGw
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3NTgxMjc5NTQ3NzksImVtYWlsIjoiYm9iQHBheXBhbC5jb20iLCJpYXQiOjE3NTgxMjk0MjUsImV4cCI6MTc1ODIxNTgyNX0.LvXRUvU2XPi66l6HSX0JbEjj6fW5RVU15pAr29GtGGw
+[2025-09-17 22:47:05] ✅ Token extracted successfully for bob@paypal.com
+[2025-09-17 22:47:05] 🔒 Token details: eyJhbGciOiJIUzI1NiIs...
+[2025-09-17 22:47:05] 🔑 Verifying token immediately after login
+[2025-09-17 22:47:05] 🔄 API Call: POST http://localhost:8080/api/auth/verify
+[2025-09-17 22:47:05] 📥 Response: {"valid":false,"error":"Invalid token","details":"jwt malformed"}
+[2025-09-17 22:47:06] 🔑 Logging in user: charlie@paypal.com
+[2025-09-17 22:47:06] 🔄 API Call: POST http://localhost:8080/api/auth/login
+[2025-09-17 22:47:06] 📥 Response: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3NTgxMjc5NTYxMjcsImVtYWlsIjoiY2hhcmxpZUBwYXlwYWwuY29tIiwiaWF0IjoxNzU4MTI5NDI2LCJleHAiOjE3NTgyMTU4MjZ9.iPBektvflokjEaSFfLvveD_vucggRW2UX_JcrvcYk00","userId":1758127956127}
+[2025-09-17 22:47:06] 🐞 Raw login response: [2025-09-17 22:47:06] 🔄 API Call: POST http://localhost:8080/api/auth/login
+[2025-09-17 22:47:06] 📥 Response: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3NTgxMjc5NTYxMjcsImVtYWlsIjoiY2hhcmxpZUBwYXlwYWwuY29tIiwiaWF0IjoxNzU4MTI5NDI2LCJleHAiOjE3NTgyMTU4MjZ9.iPBektvflokjEaSFfLvveD_vucggRW2UX_JcrvcYk00","userId":1758127956127}
+{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3NTgxMjc5NTYxMjcsImVtYWlsIjoiY2hhcmxpZUBwYXlwYWwuY29tIiwiaWF0IjoxNzU4MTI5NDI2LCJleHAiOjE3NTgyMTU4MjZ9.iPBektvflokjEaSFfLvveD_vucggRW2UX_JcrvcYk00","userId":1758127956127}
+[2025-09-17 22:47:06] 🐞 Extracted token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3NTgxMjc5NTYxMjcsImVtYWlsIjoiY2hhcmxpZUBwYXlwYWwuY29tIiwiaWF0IjoxNzU4MTI5NDI2LCJleHAiOjE3NTgyMTU4MjZ9.iPBektvflokjEaSFfLvveD_vucggRW2UX_JcrvcYk00
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3NTgxMjc5NTYxMjcsImVtYWlsIjoiY2hhcmxpZUBwYXlwYWwuY29tIiwiaWF0IjoxNzU4MTI5NDI2LCJleHAiOjE3NTgyMTU4MjZ9.iPBektvflokjEaSFfLvveD_vucggRW2UX_JcrvcYk00
+[2025-09-17 22:47:06] ✅ Token extracted successfully for charlie@paypal.com
+[2025-09-17 22:47:06] 🔒 Token details: eyJhbGciOiJIUzI1NiIs...
+[2025-09-17 22:47:06] 🔑 Verifying token immediately after login
+[2025-09-17 22:47:06] 🔄 API Call: POST http://localhost:8080/api/auth/verify
+[2025-09-17 22:47:06] 📥 Response: {"valid":false,"error":"Invalid token","details":"jwt malformed"}
+[2025-09-17 22:47:07] 
+[2025-09-17 22:47:07] ✅ STEP 4: Token Verification
+[2025-09-17 22:47:07] =============================
+[2025-09-17 22:47:07] DEBUG Raw token for alice@paypal.com: ->eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3NTgxMjc5NTM0NTAsImVtYWlsIjoiYWxpY2VAcGF5cGFsLmNvbSIsImlhdCI6MTc1ODEyOTQyMywiZXhwIjoxNzU4MjE1ODIzfQ.PfHiZRvQtbXLnPgoFILfxxWTzZnifYw1BaRJCiCxvfgeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3NTgxMjc5NTM0NTAsImVtYWlsIjoiYWxpY2VAcGF5cGFsLmNvbSIsImlhdCI6MTc1ODEyOTQyMywiZXhwIjoxNzU4MjE1ODIzfQ.PfHiZRvQtbXLnPgoFILfxxWTzZnifYw1BaRJCiCxvfg<-
+[2025-09-17 22:47:07] 🎫 Verifying token for alice@paypal.com
+[2025-09-17 22:47:07] 🔄 API Call: POST http://localhost:8080/api/auth/verify
+[2025-09-17 22:47:07] 📥 Response: {"valid":false,"error":"Invalid token","details":"jwt malformed"}
+[2025-09-17 22:47:08] DEBUG Raw token for bob@paypal.com: ->eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3NTgxMjc5NTQ3NzksImVtYWlsIjoiYm9iQHBheXBhbC5jb20iLCJpYXQiOjE3NTgxMjk0MjUsImV4cCI6MTc1ODIxNTgyNX0.LvXRUvU2XPi66l6HSX0JbEjj6fW5RVU15pAr29GtGGweyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3NTgxMjc5NTQ3NzksImVtYWlsIjoiYm9iQHBheXBhbC5jb20iLCJpYXQiOjE3NTgxMjk0MjUsImV4cCI6MTc1ODIxNTgyNX0.LvXRUvU2XPi66l6HSX0JbEjj6fW5RVU15pAr29GtGGw<-
+[2025-09-17 22:47:08] 🎫 Verifying token for bob@paypal.com
+[2025-09-17 22:47:08] 🔄 API Call: POST http://localhost:8080/api/auth/verify
+[2025-09-17 22:47:08] 📥 Response: {"valid":false,"error":"Invalid token","details":"jwt malformed"}
+[2025-09-17 22:47:09] DEBUG Raw token for charlie@paypal.com: ->eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3NTgxMjc5NTYxMjcsImVtYWlsIjoiY2hhcmxpZUBwYXlwYWwuY29tIiwiaWF0IjoxNzU4MTI5NDI2LCJleHAiOjE3NTgyMTU4MjZ9.iPBektvflokjEaSFfLvveD_vucggRW2UX_JcrvcYk00eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3NTgxMjc5NTYxMjcsImVtYWlsIjoiY2hhcmxpZUBwYXlwYWwuY29tIiwiaWF0IjoxNzU4MTI5NDI2LCJleHAiOjE3NTgyMTU4MjZ9.iPBektvflokjEaSFfLvveD_vucggRW2UX_JcrvcYk00<-
+[2025-09-17 22:47:09] 🎫 Verifying token for charlie@paypal.com
+[2025-09-17 22:47:09] 🔄 API Call: POST http://localhost:8080/api/auth/verify
+[2025-09-17 22:47:09] 📥 Response: {"valid":false,"error":"Invalid token","details":"jwt malformed"}
+[2025-09-17 22:47:10] 
+[2025-09-17 22:47:10] 💳 STEP 5: Payment Processing
+[2025-09-17 22:47:10] =============================
+[2025-09-17 22:47:10] 💰 Processing payment: 50.00 to john@example.com
+[2025-09-17 22:47:10] 🔄 API Call: POST http://localhost:8080/api/payment/process
+[2025-09-17 22:47:10] 📥 Response: {"error":"Invalid token"}
+[2025-09-17 22:47:12] 💰 Processing payment: 150.75 to sarah@store.com
+[2025-09-17 22:47:12] 🔄 API Call: POST http://localhost:8080/api/payment/process
+[2025-09-17 22:47:12] 📥 Response: {"error":"Invalid token"}
+[2025-09-17 22:47:14] 💰 Processing payment: 25.50 to mike@restaurant.com
+[2025-09-17 22:47:14] 🔄 API Call: POST http://localhost:8080/api/payment/process
+[2025-09-17 22:47:14] 📥 Response: {"error":"Invalid token"}

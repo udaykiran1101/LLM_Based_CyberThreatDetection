@@ -6,7 +6,8 @@ LOG_FILE="logs/ecosystem-$(date +%Y%m%d-%H%M%S).log"
 mkdir -p logs
 
 log_with_timestamp() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
+    # The >&2 redirects the echo output to standard error
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >&2 | tee -a "$LOG_FILE"
 }
 
 make_api_call() {
@@ -36,9 +37,10 @@ make_api_call() {
 }
 
 extract_json_value() {
-    local json="$1" 
+    local json="$1"
     local key="$2"
-    echo "$json" | grep -o "\"$key\":\"[^\"]*\"" | sed -E 's/"[^"]*":"([^"]*)"/\1/'
+    # The -r flag outputs the raw string without quotes
+    echo "$json" | jq -r ".${key}"
 }
 
 log_with_timestamp "🚀 Starting PayPal Clone Ecosystem Test Suite"
@@ -70,7 +72,7 @@ for user in "${users[@]}"; do
     sleep 1
 done
 
-# STEP 3: User Login
+# STEP 3: User Login (Simplified)
 log_with_timestamp ""
 log_with_timestamp "🔐 STEP 3: User Login"
 log_with_timestamp "====================="
@@ -78,9 +80,11 @@ log_with_timestamp "====================="
 for user in "${users[@]}"; do
     log_with_timestamp "🔑 Logging in user: $user"
     response=$(make_api_call "POST" "/auth/login" "{\"email\":\"$user\",\"password\":\"password123\"}" "")
-    
+    log_with_timestamp "🐞 Raw login response: $response"
+
+    # The new function handles everything cleanly
     token=$(extract_json_value "$response" "token")
-    token=$(echo "$token" | tr -d '\n\r' | sed 's/[[:space:]]//g')
+    log_with_timestamp "🐞 Extracted token: $token"
     
     if [ -n "$token" ] && [ "$token" != "null" ]; then
         tokens+=("$token")
@@ -97,14 +101,18 @@ for user in "${users[@]}"; do
     fi
     sleep 1
 done
-
+    
 # STEP 4: Token Verification
 log_with_timestamp ""
 log_with_timestamp "✅ STEP 4: Token Verification"  
 log_with_timestamp "============================="
 
 for i in "${!tokens[@]}"; do
-    token="${tokens[$i]}"
+    # Clean token (remove quotes, newlines, carriage returns, spaces)
+    token=$(echo "${tokens[$i]}" | tr -d '\n\r" ')
+    
+    log_with_timestamp "DEBUG Raw token for ${users[$i]}: ->${token}<-"
+3
     if [ -n "$token" ] && [ "$token" != "null" ]; then
         log_with_timestamp "🎫 Verifying token for ${users[$i]}"
         make_api_call "POST" "/auth/verify" "" "Authorization: Bearer $token"
@@ -113,6 +121,7 @@ for i in "${!tokens[@]}"; do
         log_with_timestamp "⚠️ Skipping verification for ${users[$i]} - no valid token"
     fi
 done
+
 
 # STEP 5: Payment Processing
 log_with_timestamp ""
