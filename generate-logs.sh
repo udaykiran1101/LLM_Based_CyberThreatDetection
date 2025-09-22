@@ -8,7 +8,7 @@ mkdir -p logs
 log_with_timestamp() {
     # The >&2 redirects the echo output to standard error
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >&2 | tee -a "$LOG_FILE"
-}
+}   
 
 make_api_call() {
     local method=$1

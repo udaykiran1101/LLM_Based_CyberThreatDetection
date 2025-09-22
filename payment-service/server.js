@@ -5,108 +5,150 @@ const { v4: uuidv4 } = require('uuid');
 const app = express();
 app.use(express.json());
 
-const payments = []; // In-memory store for demo
-const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || 'http://auth-service:3001';
-const NOTIFICATION_SERVICE_URL = process.env.NOTIFICATION_SERVICE_URL || 'http://notification-service:3003';
+// Centralized logger based on CSIC 2010 dataset format
+const logEvent = (req, classification, event, details) => {
+    const timestamp = new Date().toISOString();
+    
+    // Safely stringify the body
+    const content = req.body ? JSON.stringify(req.body) : '';
+
+    const logObject = {
+        timestamp,
+        // Map request details to the specified feature names
+        'Method': req.method,
+        'URL': req.originalUrl,
+        'User-Agent': req.headers['user-agent'] || '-',
+        'Pragma': req.headers['pragma'] || '-',
+        'Cache-Control': req.headers['cache-control'] || '-',
+        'Accept': req.headers['accept'] || '-',
+        'Accept-encoding': req.headers['accept-encoding'] || '-',
+        'Accept-charset': req.headers['accept-charset'] || '-',
+        'language': req.headers['accept-language'] || '-',
+        'host': req.headers['host'] || '-',
+        'cookie': req.headers['cookie'] || '-',
+        'content-type': req.headers['content-type'] || '-',
+        'connection': req.headers['connection'] || '-',
+        'lenght': req.headers['content-length'] || '0',
+        'content': content,
+        'classification': classification, // 'Normal' or 'Suspicious'
+        'event': event, // Custom event name
+        ...details, // Additional details
+    };
+
+    // Convert to key-value format for easy parsing
+    const logString = Object.entries(logObject)
+        .map(([key, value]) => `${key}="${value}"`)
+        .join(' ');
+    console.log(logString);
+};
+
+// In-memory store for demo
+const payments = [];
 
 // Health check
 app.get('/health', (req, res) => {
-    console.log('[PAYMENT-SERVICE] Health check requested');
+    logEvent(req, 'Normal', 'HealthCheck', { service: 'payment-service' });
     res.json({ status: 'healthy', service: 'payment-service', timestamp: new Date() });
 });
 
 // Middleware to verify token
-const verifyToken = async (req, res, next) => {
+const authenticate = async (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(' ')[1];
+    
+    logEvent(req, 'Normal', 'AuthenticationAttempt', { hasToken: !!token });
+
+    if (!token) {
+        logEvent(req, 'Suspicious', 'AuthenticationFailure', { reason: 'NoTokenProvided' });
+        return res.status(401).json({ error: 'No token provided' });
+    }
+
     try {
-        const token = req.headers.authorization?.replace('Bearer ', '');
-        if (!token) {
-            return res.status(401).json({ error: 'No token provided' });
+        // The payment service should not have the secret. It asks the auth service.
+        const response = await axios.post('http://auth-service:3001/verify', { token });
+        if (response.data.valid) {
+            req.user = response.data; // Attach user info to request
+            logEvent(req, 'Normal', 'AuthenticationSuccess', { userId: req.user.userId, email: req.user.email });
+            next();
+        } else {
+            logEvent(req, 'Suspicious', 'AuthenticationFailure', { reason: 'InvalidToken' });
+            res.status(401).json({ error: 'Invalid token' });
         }
-
-        console.log('[PAYMENT-SERVICE] Verifying token with auth service');
-
-        // Pass token in Authorization header to auth-service
-        const response = await axios.post(`${AUTH_SERVICE_URL}/verify`, {}, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
-
-        req.user = response.data;
-        next();
     } catch (error) {
-        console.error('[PAYMENT-SERVICE] Token verification failed:', error.response?.data || error.message);
-        res.status(401).json({ error: 'Invalid token' });
+        logEvent(req, 'Suspicious', 'AuthenticationError', { 
+            reason: 'AuthServiceUnreachable', 
+            error: error.message 
+        });
+        res.status(500).json({ error: 'Failed to verify token with auth service' });
     }
 };
 
-
 // Process payment
-app.post('/process', verifyToken, async (req, res) => {
+app.post('/process', authenticate, async (req, res) => {
+    const { amount, recipient } = req.body;
+    const { userId, email } = req.user;
+
+    logEvent(req, 'Normal', 'PaymentProcessingAttempt', { userId, email, amount, recipient });
+
     try {
-        const { amount, recipient, description } = req.body;
-        const paymentId = uuidv4();
-        
-        console.log(`[PAYMENT-SERVICE] Processing payment: $${amount} from ${req.user.email} to ${recipient}`);
-        
-        // Simulate payment processing
-        const payment = {
-            id: paymentId,
-            senderId: req.user.userId,
-            senderEmail: req.user.email,
-            recipient,
-            amount,
-            description,
-            status: 'completed',
-            timestamp: new Date()
+        const payment = { 
+            id: Date.now(), 
+            userId, 
+            email,
+            amount, 
+            recipient, 
+            description: req.body.description, 
+            timestamp: new Date() 
         };
-        
         payments.push(payment);
-        
-        // Send notification
-        try {
-            console.log('[PAYMENT-SERVICE] Sending notification');
-            await axios.post(`${NOTIFICATION_SERVICE_URL}/send`, {
-                userId: req.user.userId,
-                email: req.user.email,
-                type: 'payment_sent',
-                message: `Payment of $${amount} sent to ${recipient}`,
-                paymentId
-            });
-        } catch (notifError) {
-            console.error('[PAYMENT-SERVICE] Notification failed:', notifError.message);
-        }
-        
-        console.log(`[PAYMENT-SERVICE] Payment processed successfully: ${paymentId}`);
-        res.json({ 
-            success: true, 
-            paymentId, 
-            message: 'Payment processed successfully',
-            payment 
+
+        // Asynchronously notify the notification service
+        axios.post('http://notification-service:3003/send', {
+            userId,
+            email,
+            type: 'PAYMENT_SUCCESS',
+            message: `Your payment of $${amount} to ${recipient} was successful.`,
+        }).catch(err => {
+            // This is an internal error, not directly tied to the user's request,
+            // so we log it differently.
+            console.log(`timestamp="${new Date().toISOString()}" classification="Suspicious" event="NotificationDispatchFailure" error="${err.message}"`);
         });
+
+        logEvent(req, 'Normal', 'PaymentProcessingSuccess', { paymentId: payment.id, userId, amount });
+        res.json({ message: 'Payment processed successfully', paymentId: payment.id });
     } catch (error) {
-        console.error('[PAYMENT-SERVICE] Payment processing error:', error);
+        logEvent(req, 'Suspicious', 'PaymentProcessingFailure', { userId, amount, error: error.message });
         res.status(500).json({ error: 'Payment processing failed' });
     }
 });
 
 // Get payment history
-app.get('/history', verifyToken, (req, res) => {
-    console.log(`[PAYMENT-SERVICE] Fetching payment history for: ${req.user.email}`);
-    const userPayments = payments.filter(p => p.senderId === req.user.userId);
-    res.json({ payments: userPayments });
-});
-
-// Get payment by ID
-app.get('/payment/:id', verifyToken, (req, res) => {
-    const payment = payments.find(p => p.id === req.params.id);
-    if (!payment) {
-        return res.status(404).json({ error: 'Payment not found' });
-    }
+app.get('/history', authenticate, (req, res) => {
+    const { userId } = req.user;
+    logEvent(req, 'Normal', 'PaymentHistoryRetrieval', { userId });
     
-    console.log(`[PAYMENT-SERVICE] Payment details requested: ${req.params.id}`);
-    res.json({ payment });
+    const userPayments = payments.filter(p => p.userId === userId);
+    res.json(userPayments);
 });
 
-const PORT = process.env.PORT || 3002;
+// Get payment details
+app.get('/payment/:id', authenticate, (req, res) => {
+    const { userId } = req.user;
+    const paymentId = parseInt(req.params.id, 10);
+    
+    logEvent(req, 'Normal', 'PaymentDetailsRetrieval', { userId, paymentId });
+
+    const payment = payments.find(p => p.id === paymentId && p.userId === userId);
+    if (payment) {
+        res.json(payment);
+    } else {
+        logEvent(req, 'Suspicious', 'PaymentDetailsNotFound', { userId, paymentId });
+        res.status(404).json({ error: 'Payment not found' });
+    }
+});
+
+const PORT = 3002;
 app.listen(PORT, () => {
-    console.log(`[PAYMENT-SERVICE] Server running on port ${PORT}`);
+    // For startup, we don't have a request object, so log a simple message
+    console.log(`timestamp="${new Date().toISOString()}" classification="Normal" event="ServerStart" service="PAYMENT-SERVICE" port="${PORT}"`);
 });
