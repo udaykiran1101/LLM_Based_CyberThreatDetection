@@ -1,4 +1,4 @@
-#!/bin/bash
+    #!/bin/bash
 
 # Colors for output
 RED='\033[0;31m'
@@ -16,11 +16,13 @@ show_help() {
     echo "  -a, --api        Monitor API Gateway traffic"
     echo "  -s, --service    Monitor service-to-service communication"
     echo "  -t, --tcp        Show TCP connections between services"
+    echo "  -c, --capture    Capture traffic to a .pcap file (e.g., traffic.pcap)"
     echo "  -h, --help       Show this help message"
     echo ""
     echo "Examples:"
     echo "  ./network-logs.sh --api"
     echo "  ./network-logs.sh --service auth-service"
+    echo "  sudo ./network-logs.sh --capture my_capture.pcap"
     echo ""
 }
 
@@ -37,6 +39,14 @@ monitor_api_gateway() {
     echo -e "${GREEN}📊 Monitoring API Gateway traffic (port 8080)...${NC}"
     echo -e "${YELLOW}Press Ctrl+C to stop monitoring${NC}"
     sudo tcpdump -i any "port 8080" -A -n
+}
+
+# Capture traffic to a pcap file
+capture_to_pcap() {
+    local filename=$1
+    echo -e "${GREEN}📦 Capturing all traffic to $filename...${NC}"
+    echo -e "${YELLOW}Press Ctrl+C to stop capturing${NC}"
+    sudo tcpdump -i any -w "$filename"
 }
 
 # Monitor service-to-service communication
@@ -98,6 +108,15 @@ case "${1:-}" in
         fi
         check_tcpdump
         monitor_service "$2"
+        ;;
+    -c|--capture)
+        if [ -z "$2" ]; then
+            echo -e "${RED}Please specify a filename for the capture (e.g., traffic.pcap)${NC}"
+            show_help
+            exit 1
+        fi
+        check_tcpdump
+        capture_to_pcap "$2"
         ;;
     -t|--tcp)
         show_tcp_connections

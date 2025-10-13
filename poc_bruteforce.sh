@@ -13,7 +13,7 @@ letmein
 password1
 WL
 
-END=$((SECONDS+30))
+END=$((SECONDS+35))
 echo "Starting small brute-force for 30s, attack id=$ATTACK_ID"
 while [ $SECONDS -lt $END ]; do
   for pw in $(cat $WORDLIST); do

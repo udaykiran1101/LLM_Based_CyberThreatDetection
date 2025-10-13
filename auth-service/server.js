@@ -7,7 +7,7 @@ const app = express();
 app.use(express.json());
 
 // Centralized logger based on CSIC 2010 dataset format
-const logEvent = (req, classification, event, details) => {
+const logEvent = (req,event, details) => {
     const timestamp = new Date().toISOString();
     
     // Safely stringify the body
@@ -30,8 +30,7 @@ const logEvent = (req, classification, event, details) => {
         'content-type': req.headers['content-type'] || '-',
         'connection': req.headers['connection'] || '-',
         'lenght': req.headers['content-length'] || '0',
-        'content': content,
-        'classification': classification, // 'Normal' or 'Suspicious'
+        'content': content, 
         'event': event, // Custom event name
         ...details, // Additional details
     };
@@ -51,24 +50,24 @@ const users = []; // In-memory store for demo
 
 // Health check
 app.get('/health', (req, res) => {
-    logEvent(req, 'Normal', 'HealthCheck', { service: 'auth-service' });
+    logEvent(req,'HealthCheck', { service: 'auth-service' });
     res.json({ status: 'healthy', service: 'auth-service', timestamp: new Date() });
 });
 
 // Register user
 app.post('/register', async (req, res) => {
     const { email } = req.body;
-    logEvent(req, 'Normal', 'RegistrationAttempt', { email });
+    logEvent(req,'RegistrationAttempt', { email });
     
     try {
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
         const user = { id: Date.now(), email, password: hashedPassword };
         users.push(user);
         
-        logEvent(req, 'Normal', 'RegistrationSuccess', { email, userId: user.id });
+        logEvent(req,'RegistrationSuccess', { email, userId: user.id });
         res.json({ message: 'User registered successfully', userId: user.id });
     } catch (error) {
-        logEvent(req, 'Suspicious', 'RegistrationFailure', { email, error: error.message });
+        logEvent(req,'RegistrationFailure', { email, error: error.message });
         res.status(500).json({ error: 'Registration failed' });
     }
 });
@@ -81,15 +80,15 @@ app.post('/login', async (req, res) => {
     try {
         const user = users.find(u => u.email === email);
         if (!user || !await bcrypt.compare(password, user.password)) {
-            logEvent(req, 'Suspicious', 'LoginFailure', { email, reason: 'InvalidCredentials' });
+            logEvent(req, 'LoginFailure', { email, reason: 'InvalidCredentials' });
             return res.status(401).json({ error: 'Invalid credentials' });
         }
         
         const token = jwt.sign({ userId: user.id, email }, JWT_SECRET, { expiresIn: '24h' });
-        logEvent(req, 'Normal', 'LoginSuccess', { email, userId: user.id });
+        logEvent(req,'LoginSuccess', { email, userId: user.id });
         res.json({ token, userId: user.id });
     } catch (error) {
-        logEvent(req, 'Suspicious', 'LoginError', { email, error: error.message });
+        logEvent(req, 'LoginError', { email, error: error.message });
         res.status(500).json({ error: 'Login failed' });
     }
 });
@@ -100,19 +99,19 @@ app.post('/verify', (req, res) => {
     const tokenFromBody = req.body.token;
     const token = tokenFromHeader || tokenFromBody;
     
-    logEvent(req, 'Normal', 'TokenVerificationAttempt', { hasToken: !!token });
+    logEvent(req,'TokenVerificationAttempt', { hasToken: !!token });
 
     if (!token) {
-        logEvent(req, 'Suspicious', 'TokenVerificationFailure', { reason: 'NoTokenProvided' });
+        logEvent(req,'TokenVerificationFailure', { reason: 'NoTokenProvided' });
         return res.status(401).json({ valid: false, error: 'No token provided' });
     }
 
     try {
         const decoded = jwt.verify(token, JWT_SECRET, { algorithms: ['HS256'] });
-        logEvent(req, 'Normal', 'TokenVerificationSuccess', { userId: decoded.userId, email: decoded.email });
+        logEvent(req,'TokenVerificationSuccess', { userId: decoded.userId, email: decoded.email });
         res.json({ valid: true, userId: decoded.userId, email: decoded.email });
     } catch (jwtError) {
-        logEvent(req, 'Suspicious', 'TokenVerificationFailure', { 
+        logEvent(req,'TokenVerificationFailure', { 
             reason: 'InvalidToken', 
             errorName: jwtError.name, 
             errorMessage: jwtError.message 

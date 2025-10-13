@@ -6,7 +6,7 @@ const app = express();
 app.use(express.json());
 
 // Centralized logger based on CSIC 2010 dataset format
-const logEvent = (req, classification, event, details) => {
+const logEvent = (req, event, details) => {
     const timestamp = new Date().toISOString();
     
     // Safely stringify the body
@@ -30,7 +30,6 @@ const logEvent = (req, classification, event, details) => {
         'connection': req.headers['connection'] || '-',
         'lenght': req.headers['content-length'] || '0',
         'content': content,
-        'classification': classification, // 'Normal' or 'Suspicious'
         'event': event, // Custom event name
         ...details, // Additional details
     };
@@ -47,7 +46,7 @@ const payments = [];
 
 // Health check
 app.get('/health', (req, res) => {
-    logEvent(req, 'Normal', 'HealthCheck', { service: 'payment-service' });
+    logEvent(req, 'HealthCheck', { service: 'payment-service' });
     res.json({ status: 'healthy', service: 'payment-service', timestamp: new Date() });
 });
 
@@ -56,10 +55,10 @@ const authenticate = async (req, res, next) => {
     const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.split(' ')[1];
     
-    logEvent(req, 'Normal', 'AuthenticationAttempt', { hasToken: !!token });
+    logEvent(req, 'AuthenticationAttempt', { hasToken: !!token });
 
     if (!token) {
-        logEvent(req, 'Suspicious', 'AuthenticationFailure', { reason: 'NoTokenProvided' });
+        logEvent(req, 'AuthenticationFailure', { reason: 'NoTokenProvided' });
         return res.status(401).json({ error: 'No token provided' });
     }
 
@@ -68,14 +67,14 @@ const authenticate = async (req, res, next) => {
         const response = await axios.post('http://auth-service:3001/verify', { token });
         if (response.data.valid) {
             req.user = response.data; // Attach user info to request
-            logEvent(req, 'Normal', 'AuthenticationSuccess', { userId: req.user.userId, email: req.user.email });
+            logEvent(req, 'AuthenticationSuccess', { userId: req.user.userId, email: req.user.email });
             next();
         } else {
-            logEvent(req, 'Suspicious', 'AuthenticationFailure', { reason: 'InvalidToken' });
+            logEvent(req, 'AuthenticationFailure', { reason: 'InvalidToken' });
             res.status(401).json({ error: 'Invalid token' });
         }
     } catch (error) {
-        logEvent(req, 'Suspicious', 'AuthenticationError', { 
+        logEvent(req, 'AuthenticationError', { 
             reason: 'AuthServiceUnreachable', 
             error: error.message 
         });
@@ -88,7 +87,7 @@ app.post('/process', authenticate, async (req, res) => {
     const { amount, recipient } = req.body;
     const { userId, email } = req.user;
 
-    logEvent(req, 'Normal', 'PaymentProcessingAttempt', { userId, email, amount, recipient });
+    logEvent(req, 'PaymentProcessingAttempt', { userId, email, amount, recipient });
 
     try {
         const payment = { 
@@ -111,13 +110,13 @@ app.post('/process', authenticate, async (req, res) => {
         }).catch(err => {
             // This is an internal error, not directly tied to the user's request,
             // so we log it differently.
-            console.log(`timestamp="${new Date().toISOString()}" classification="Suspicious" event="NotificationDispatchFailure" error="${err.message}"`);
+            console.log(`timestamp="${new Date().toISOString()}" event="NotificationDispatchFailure" error="${err.message}"`);
         });
 
-        logEvent(req, 'Normal', 'PaymentProcessingSuccess', { paymentId: payment.id, userId, amount });
+        logEvent(req, 'PaymentProcessingSuccess', { paymentId: payment.id, userId, amount });
         res.json({ message: 'Payment processed successfully', paymentId: payment.id });
     } catch (error) {
-        logEvent(req, 'Suspicious', 'PaymentProcessingFailure', { userId, amount, error: error.message });
+        logEvent(req, 'PaymentProcessingFailure', { userId, amount, error: error.message });
         res.status(500).json({ error: 'Payment processing failed' });
     }
 });
@@ -125,7 +124,7 @@ app.post('/process', authenticate, async (req, res) => {
 // Get payment history
 app.get('/history', authenticate, (req, res) => {
     const { userId } = req.user;
-    logEvent(req, 'Normal', 'PaymentHistoryRetrieval', { userId });
+    logEvent(req, 'PaymentHistoryRetrieval', { userId });
     
     const userPayments = payments.filter(p => p.userId === userId);
     res.json(userPayments);
@@ -136,13 +135,13 @@ app.get('/payment/:id', authenticate, (req, res) => {
     const { userId } = req.user;
     const paymentId = parseInt(req.params.id, 10);
     
-    logEvent(req, 'Normal', 'PaymentDetailsRetrieval', { userId, paymentId });
+    logEvent(req, 'PaymentDetailsRetrieval', { userId, paymentId });
 
     const payment = payments.find(p => p.id === paymentId && p.userId === userId);
     if (payment) {
         res.json(payment);
     } else {
-        logEvent(req, 'Suspicious', 'PaymentDetailsNotFound', { userId, paymentId });
+        logEvent(req, 'PaymentDetailsNotFound', { userId, paymentId });
         res.status(404).json({ error: 'Payment not found' });
     }
 });
@@ -150,5 +149,5 @@ app.get('/payment/:id', authenticate, (req, res) => {
 const PORT = 3002;
 app.listen(PORT, () => {
     // For startup, we don't have a request object, so log a simple message
-    console.log(`timestamp="${new Date().toISOString()}" classification="Normal" event="ServerStart" service="PAYMENT-SERVICE" port="${PORT}"`);
+    console.log(`timestamp="${new Date().toISOString()}" event="ServerStart" service="PAYMENT-SERVICE" port="${PORT}"`);
 });

@@ -5,7 +5,7 @@ const app = express();
 app.use(express.json());
 
 // Centralized logger based on CSIC 2010 dataset format
-const logEvent = (req, classification, event, details) => {
+const logEvent = (req,event, details) => {
     const timestamp = new Date().toISOString();
     
     // Safely stringify the body
@@ -29,7 +29,6 @@ const logEvent = (req, classification, event, details) => {
         'connection': req.headers['connection'] || '-',
         'lenght': req.headers['content-length'] || '0',
         'content': content,
-        'classification': classification, // 'Normal' or 'Suspicious'
         'event': event, // Custom event name
         ...details, // Additional details
     };
@@ -46,33 +45,58 @@ const notifications = [];
 
 // Health check
 app.get('/health', (req, res) => {
-    logEvent(req, 'Normal', 'HealthCheck', { service: 'notification-service' });
+    logEvent(req, 'HealthCheck', { service: 'notification-service' });
     res.json({ status: 'healthy', service: 'notification-service', timestamp: new Date() });
 });
 
 // Send notification
 app.post('/send', (req, res) => {
     const { userId, email, type } = req.body;
-    logEvent(req, 'Normal', 'NotificationReceived', { userId, email, type });
+    logEvent(req, 'NotificationReceived', { userId, email, type });
 
     try {
         const notification = { 
-            id: Date.now(), 
-            userId, 
-            email,
-            type,
-            message: req.body.message, 
-            read: false,
-            timestamp: new Date() 
+// ... existing code ...
         };
         notifications.push(notification);
         
-        logEvent(req, 'Normal', 'NotificationStored', { notificationId: notification.id, userId });
+        logEvent(req, 'NotificationStored', { notificationId: notification.id, userId });
         res.status(201).json({ message: 'Notification stored', notificationId: notification.id });
     } catch (error) {
-        logEvent(req, 'Suspicious', 'NotificationStoreFailure', { userId, type, error: error.message });
+        logEvent(req, 'NotificationStoreFailure', { userId, type, error: error.message });
         res.status(500).json({ error: 'Failed to store notification' });
     }
+});
+
+// Get user notifications
+app.get('/notifications/:userId', (req, res) => {
+    const userId = parseInt(req.params.userId, 10);
+    logEvent(req, 'NotificationRetrievalAttempt', { userId });
+
+    const userNotifications = notifications.filter(n => n.userId === userId);
+    res.json(userNotifications);
+});
+
+// Mark notification as read
+app.put('/read/:id', (req, res) => {
+    const notificationId = parseInt(req.params.id, 10);
+    logEvent(req, 'NotificationMarkReadAttempt', { notificationId });
+
+    const notification = notifications.find(n => n.id === notificationId);
+    if (notification) {
+        notification.read = true;
+        logEvent(req, 'NotificationMarkReadSuccess', { notificationId });
+        res.json({ message: 'Notification marked as read', notification });
+    } else {
+        logEvent(req, 'NotificationMarkReadFailure', { notificationId, reason: 'NotFound' });
+        res.status(404).json({ error: 'Notification not found' });
+    }
+});
+
+const PORT = 3003;
+app.listen(PORT, () => {
+    // For startup, we don't have a request object, so log a simple message
+    console.log(`timestamp="${new Date().toISOString()}" event="ServerStart" service="NOTIFICATION-SERVICE" port="${PORT}"`);
 });
 
 // Get user notifications
@@ -100,7 +124,6 @@ app.put('/read/:id', (req, res) => {
     }
 });
 
-const PORT = 3003;
 app.listen(PORT, () => {
     // For startup, we don't have a request object, so log a simple message
     console.log(`timestamp="${new Date().toISOString()}" classification="Normal" event="ServerStart" service="NOTIFICATION-SERVICE" port="${PORT}"`);
