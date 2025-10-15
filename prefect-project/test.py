@@ -58,6 +58,7 @@ NORMAL_LOGS_TO_TEST = [
     'payment-service-1 | Method="GET" URL="/profile/settings" User-Agent="Mozilla/5.0" host="localhost"',
     'payment-service-1 | Method="GET" URL="/assets/style.css" User-Agent="Mozilla/5.0" host="localhost"',
     'payment-service-1 | Method="POST" URL="/logout" User-Agent="Mozilla/5.0" host="localhost"',
+    'payment-service-1 | Method="POST" URL="/process?id=1&action=update\' OR \'1\'=\'1" User-Agent="Mozilla/5.0" host="localhost"'
 ]
 
 # --- Step 3: Main testing logic ---
@@ -66,8 +67,8 @@ def run_false_positive_test():
 
     # Load model (same as in your Prefect task)
     base_model_name = "distilbert-base-uncased"
-    adapter_path = "/home/uday/Downloads/distilbert_lora_webattack_coral/best_model_with_lora_coral"
-    tokenizer = AutoTokenizer.from_pretrained(adapter_path)
+    adapter_path = "/home/uday/Downloads/89_model/89_model/"
+    tokenizer = AutoTokenizer.from_pretrained(base_model_name)
     base_model = AutoModelForSequenceClassification.from_pretrained(base_model_name, num_labels=2)
     model = PeftModel.from_pretrained(base_model, adapter_path)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
